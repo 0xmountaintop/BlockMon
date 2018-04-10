@@ -52,6 +52,8 @@ func main() {
     log.Printf("Block Count: %d\n\n", resp.Data.BlockCount)
 
     var dataStr string
+    var elapsed string
+    last_blck_timestamp := int64(0)
     for i := uint64(1); i <= resp.Data.BlockCount; i++ {
         _, body, _ = request.Post(walletAddr + "get-block").
             Send(`{
@@ -61,22 +63,41 @@ func main() {
         json.Unmarshal([]byte(body), &resp)
         // log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tNonce: %d\n\tBits: %d, e.g., %d\n\tDiff: %s",
         // log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tNonce: %d\n\tBits: %d\n\tDiff: %s",
-        log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tDiffi: %s",
-            resp.Data.Height, resp.Data.BlockCount,
-            resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0),
-            // resp.Data.Nonce,
-            // resp.Data.Bits, difficulty.CompactToBig(resp.Data.Bits),
-            // resp.Data.Bits,
-            resp.Data.Diff)
 
-            dataStr += strconv.FormatUint(resp.Data.Height, 10)
+        if i == 1 {
+            log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tDiffi: %s",
+                resp.Data.Height, resp.Data.BlockCount,
+                resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0),
+                // resp.Data.Nonce,
+                // resp.Data.Bits, difficulty.CompactToBig(resp.Data.Bits),
+                // resp.Data.Bits,
+                resp.Data.Diff)
+        } else {
+            elapsed = time.Unix(resp.Data.Timestamp,0).Sub(time.Unix(last_blck_timestamp,0)).String()
+            log.Printf("Block %d of %d:\n\tTimestamp: %d, %v, elapsed: %v\n\tDiffi: %s",
+                resp.Data.Height, resp.Data.BlockCount,
+                resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0), elapsed,
+                // resp.Data.Nonce,
+                // resp.Data.Bits, difficulty.CompactToBig(resp.Data.Bits),
+                // resp.Data.Bits,
+                resp.Data.Diff)
+        }
+        last_blck_timestamp = resp.Data.Timestamp
+
+        dataStr += strconv.FormatUint(resp.Data.Height, 10)
+        dataStr += ","
+        dataStr += strconv.FormatInt(resp.Data.Timestamp, 10)
+        dataStr += ","
+        dataStr += resp.Data.Diff
+        dataStr += ","
+        dataStr += time.Unix(resp.Data.Timestamp,0).String()
+        dataStr += ","
+        if i > 1 {
+            dataStr += "elapsed:"
+            dataStr += elapsed
             dataStr += ","
-            dataStr += strconv.FormatInt(resp.Data.Timestamp, 10)
-            dataStr += ","
-            dataStr += resp.Data.Diff
-            dataStr += ",("
-            dataStr += time.Unix(resp.Data.Timestamp,0).String()
-            dataStr += "),\n"
+        }
+        dataStr += "\n"
     }
     err := ioutil.WriteFile("./all-blocks.csv", []byte(dataStr), 0644)
     check(err)
