@@ -2,9 +2,10 @@
 package main
 
 import(
+    "log"
     "fmt"
-    // "strconv"
-    // "encoding/json"
+    "strconv"
+    "encoding/json"
     // "encoding/hex"
     // "encoding/binary"
     
@@ -16,11 +17,12 @@ import(
 
 
 type t_data struct {
+    BlockCount  uint64  `json:"block_count, omitempty"`
 }
 
-type resp struct {
-    Status  string  `json:"status"`
-    Data    t_data  `json:"data"`
+type t_resp struct {
+    Status      string  `json:"status"`
+    Data        t_data  `json:"data"`
 }
 
 
@@ -30,25 +32,30 @@ const (
 
 
 func main() {
-
     request := gorequest.New()
+    var resp t_resp
 
     _, body, _ := request.Post(walletAddr + "get-block-count").
         End()
-    fmt.Println(body)
 
-    // resp, body, _ := request.Post(poolAddr).
-    _, body, _ = request.Post(walletAddr + "get-block").
-        Send(`{"block_height": 1}`).
-        End()
+    json.Unmarshal([]byte(body), &resp)
+    if resp.Status != "success" {
+        log.Fatalln("Request fail!")    
+    }
+    log.Printf("Block Count: %d\n\n", resp.Data.BlockCount)
 
-    fmt.Println(body)
+    for i := uint64(1); i <= resp.Data.BlockCount; i++ {
+        _, body, _ = request.Post(walletAddr + "get-block").
+            Send(`{
+                    "block_height": `+ strconv.FormatUint(i, 10) + `
+                    }`).
+            End()
+        fmt.Println(body)
+    }
 
-    // var jobResp JobResp
-    // json.Unmarshal([]byte(body), &jobResp)
+
 }
 
-// bits, _ := strconv.ParseUint(job[8], 16, 64)
 /*
 func str2bytes(instr string, leng uint8) []byte {
     // fmt.Println([]byte(instr))
