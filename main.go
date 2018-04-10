@@ -5,14 +5,11 @@ import(
     "log"
     // "fmt"
     "strconv"
-    "encoding/json"
     "time"
-    // "encoding/hex"
-    // "encoding/binary"
+    "encoding/json"
+    "io/ioutil"
     
     "github.com/parnurzeal/gorequest"
-    // "github.com/bytom/protocol/bc"
-    // "github.com/bytom/crypto/sha3pool"
     // "github.com/bytom/consensus/difficulty"
 )
 
@@ -54,6 +51,7 @@ func main() {
     }
     log.Printf("Block Count: %d\n\n", resp.Data.BlockCount)
 
+    var dataStr string
     for i := uint64(1); i <= resp.Data.BlockCount; i++ {
         _, body, _ = request.Post(walletAddr + "get-block").
             Send(`{
@@ -61,44 +59,31 @@ func main() {
                     }`).
             End()
         json.Unmarshal([]byte(body), &resp)
-        log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tNonce: %d\n\tBits: %d\n\tDiff: %s",
+        // log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tNonce: %d\n\tBits: %d, e.g., %d\n\tDiff: %s",
+        // log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tNonce: %d\n\tBits: %d\n\tDiff: %s",
+        log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tDiff: %s",
             resp.Data.Height, resp.Data.BlockCount,
             resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0),
-            resp.Data.Nonce,
-            resp.Data.Bits,
+            // resp.Data.Nonce,
+            // resp.Data.Bits, difficulty.CompactToBig(resp.Data.Bits),
+            // resp.Data.Bits,
             resp.Data.Diff)
+
+            dataStr += strconv.FormatUint(resp.Data.Height, 10)
+            dataStr += ","
+            dataStr += strconv.FormatInt(resp.Data.Timestamp, 10)
+            dataStr += ","
+            dataStr += resp.Data.Diff
+            dataStr += ",("
+            dataStr += time.Unix(resp.Data.Timestamp,0).String()
+            dataStr += "),\n"
     }
+    err := ioutil.WriteFile("./all-blocks.csv", []byte(dataStr), 0644)
+    check(err)
 }
 
-/*
-func str2bytes(instr string, leng uint8) []byte {
-    // fmt.Println([]byte(instr))
-    outstr := fmt.Sprintf("%064s", instr)
-    // fmt.Println(outstr)
-
-    var b [32]byte
-    hex.Decode(b[:], []byte(outstr))
-    if len(instr) < 64 {
-        b = litE2BigE(b)    
+func check(e error) {
+    if e != nil {
+        panic(e)
     }
-    // fmt.Println(b)
-
-    h := bc.NewHash(b)
-    // fmt.Println(h.Bytes()[0:leng])
-    return h.Bytes()[0:leng]
 }
-
-func litE2BigE(buf [32]byte) [32]byte {
-    blen := len(buf)
-    for i := 0; i < blen/2; i++ {
-        buf[i], buf[blen-1-i] = buf[blen-1-i], buf[i]
-    }
-    return buf
-}
-
-func ui64To8Bytes(ui64 uint64) []byte {
-    bs := make([]byte, 8)
-    binary.LittleEndian.PutUint64(bs, ui64)
-    // fmt.Println(bs)
-    return bs
-}*/
