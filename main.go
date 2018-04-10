@@ -3,9 +3,10 @@ package main
 
 import(
     "log"
-    "fmt"
+    // "fmt"
     "strconv"
     "encoding/json"
+    "time"
     // "encoding/hex"
     // "encoding/binary"
     
@@ -18,6 +19,15 @@ import(
 
 type t_data struct {
     BlockCount  uint64  `json:"block_count, omitempty"`
+    Hash        string  `json:"hash, omitempty"`
+    PreBlckHsh  string  `json:"previous_block_hash, omitempty"`
+    Size        uint64  `json:"size, omitempty"`
+    Version     uint8   `json:"version, omitempty"`
+    Height      uint64  `json:"height, omitempty"`
+    Timestamp   int64  `json:"timestamp, omitempty"`
+    Nonce       uint64  `json:"nonce, omitempty"`
+    Bits        uint64  `json:"bits, omitempty"`
+    Diff        string  `json:"difficulty, omitempty"`
 }
 
 type t_resp struct {
@@ -50,10 +60,14 @@ func main() {
                     "block_height": `+ strconv.FormatUint(i, 10) + `
                     }`).
             End()
-        fmt.Println(body)
+        json.Unmarshal([]byte(body), &resp)
+        log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tNonce: %d\n\tBits: %d\n\tDiff: %s",
+            resp.Data.Height, resp.Data.BlockCount,
+            resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0),
+            resp.Data.Nonce,
+            resp.Data.Bits,
+            resp.Data.Diff)
     }
-
-
 }
 
 /*
