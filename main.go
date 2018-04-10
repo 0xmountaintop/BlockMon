@@ -61,7 +61,7 @@ func main() {
         json.Unmarshal([]byte(body), &resp)
         // log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tNonce: %d\n\tBits: %d, e.g., %d\n\tDiff: %s",
         // log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tNonce: %d\n\tBits: %d\n\tDiff: %s",
-        log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tDiff: %s",
+        log.Printf("Block %d of %d:\n\tTimestamp: %d, %v\n\tDiffi: %s",
             resp.Data.Height, resp.Data.BlockCount,
             resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0),
             // resp.Data.Nonce,
