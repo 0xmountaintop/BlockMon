@@ -34,8 +34,8 @@ type t_resp struct {
 
 
 const (
-    // walletAddr = "http://101.37.164.153:9888/"
-    walletAddr = "http://localhost:9888/"
+    walletAddr = "http://101.37.164.153:9888/"
+    retargetSeconds = 60
 )
 
 
@@ -55,9 +55,11 @@ func main() {
     var dataStr string
     var diffiStr string
     var elapsed time.Duration
+    var diffi_elapsed time.Duration
     last_blck_timestamp := int64(0)
     last_diffi_blck_height := uint64(1)
     last_diffi := ""
+    last_diffi_timestamp := int64(0)
     for i := uint64(1); i <= resp.Data.BlockCount; i++ {
         _, body, _ = request.Post(walletAddr + "get-block").
             Send(`{
@@ -78,13 +80,23 @@ func main() {
                 resp.Data.Diffi)
         } else {
             elapsed = time.Unix(resp.Data.Timestamp,0).Sub(time.Unix(last_blck_timestamp,0))
-            log.Printf("Block %d of %d:\n\tTimestamp: %d, %v, elapsed: %v\n\tDiffi: %s",
-                resp.Data.Height, resp.Data.BlockCount,
-                resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0), elapsed.String(),
-                // resp.Data.Nonce,
-                // resp.Data.Bits, difficulty.CompactToBig(resp.Data.Bits),
-                // resp.Data.Bits,
-                resp.Data.Diffi)
+            if elapsed.Seconds() >= retargetSeconds {
+                log.Printf("Block %d of %d:\n\tTimestamp: %d, %v, elapsed: %v\tToo long!!!\n\tDiffi: %s ",
+                    resp.Data.Height, resp.Data.BlockCount,
+                    resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0), elapsed.String(),
+                    // resp.Data.Nonce,
+                    // resp.Data.Bits, difficulty.CompactToBig(resp.Data.Bits),
+                    // resp.Data.Bits,
+                    resp.Data.Diffi)
+            } else{
+                log.Printf("Block %d of %d:\n\tTimestamp: %d, %v, elapsed: %v\n\tDiffi: %s",
+                    resp.Data.Height, resp.Data.BlockCount,
+                    resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0), elapsed.String(),
+                    // resp.Data.Nonce,
+                    // resp.Data.Bits, difficulty.CompactToBig(resp.Data.Bits),
+                    // resp.Data.Bits,
+                    resp.Data.Diffi)
+            }
         }
 
         dataStr += strconv.FormatUint(resp.Data.Height, 10)
@@ -99,20 +111,44 @@ func main() {
             dataStr += "elapsed:"
             dataStr += elapsed.String()
             dataStr += ","
-            if elapsed.Seconds() >= 60*2.5 {
+            if elapsed.Seconds() >= retargetSeconds {
                 dataStr += "Too long!!!"
             }
         }
         dataStr += "\n"
 
 
-        if resp.Data.Diffi == last_diffi {
-            log.Println("Block!!!", last_diffi_blck_height)
+        if resp.Data.Diffi != last_diffi {
+            diffi_elapsed = time.Unix(resp.Data.Timestamp,0).Sub(time.Unix(last_diffi_timestamp,0))
+            if i > 1 {
+                log.Printf("Diffi changes!!!\n\t%v at height %v\n\tto\n\t%v at height %v\n\tBlock interval: %v\n\tTaking: %v\n",
+                    last_diffi, last_diffi_blck_height, 
+                    resp.Data.Diffi, resp.Data.Height,
+                    resp.Data.Height - last_diffi_blck_height,
+                    diffi_elapsed.String())
+            }
+            diffiStr += strconv.FormatUint(resp.Data.Height, 10)
+            diffiStr += ","
+            diffiStr += strconv.FormatInt(resp.Data.Timestamp, 10)
+            diffiStr += ","
+            diffiStr += resp.Data.Diffi
+            diffiStr += ","
+            diffiStr += time.Unix(resp.Data.Timestamp,0).String()
+            diffiStr += ","
+            if i > 1 {
+                diffiStr += "blocks interval:"
+                diffiStr += strconv.FormatUint(resp.Data.Height - last_diffi_blck_height, 10)
+                diffiStr += ","
+                diffiStr += diffi_elapsed.String()
+                diffiStr += ","
+            }
+            diffiStr += "\n"
+            last_diffi_blck_height = resp.Data.Height
+            last_diffi = resp.Data.Diffi
+            last_diffi_timestamp = resp.Data.Timestamp
         }
 
-
         last_blck_timestamp = resp.Data.Timestamp
-        last_diffi = resp.Data.Diffi
     }
     err := ioutil.WriteFile("./all-blocks.csv", []byte(dataStr), 0644)
     check(err)
