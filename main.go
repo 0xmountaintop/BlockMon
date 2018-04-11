@@ -34,7 +34,8 @@ type t_resp struct {
 
 
 const (
-    walletAddr = "http://101.37.164.153:9888/"
+    // walletAddr = "http://101.37.164.153:9888/"
+    walletAddr = "http://localhost:9888/"
 )
 
 
@@ -52,7 +53,7 @@ func main() {
     log.Printf("Block Count: %d\n\n", resp.Data.BlockCount)
 
     var dataStr string
-    var elapsed string
+    var elapsed time.Duration
     last_blck_timestamp := int64(0)
     for i := uint64(1); i <= resp.Data.BlockCount; i++ {
         _, body, _ = request.Post(walletAddr + "get-block").
@@ -73,10 +74,10 @@ func main() {
                 // resp.Data.Bits,
                 resp.Data.Diff)
         } else {
-            elapsed = time.Unix(resp.Data.Timestamp,0).Sub(time.Unix(last_blck_timestamp,0)).String()
+            elapsed = time.Unix(resp.Data.Timestamp,0).Sub(time.Unix(last_blck_timestamp,0))
             log.Printf("Block %d of %d:\n\tTimestamp: %d, %v, elapsed: %v\n\tDiffi: %s",
                 resp.Data.Height, resp.Data.BlockCount,
-                resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0), elapsed,
+                resp.Data.Timestamp, time.Unix(resp.Data.Timestamp,0), elapsed.String(),
                 // resp.Data.Nonce,
                 // resp.Data.Bits, difficulty.CompactToBig(resp.Data.Bits),
                 // resp.Data.Bits,
@@ -94,8 +95,11 @@ func main() {
         dataStr += ","
         if i > 1 {
             dataStr += "elapsed:"
-            dataStr += elapsed
+            dataStr += elapsed.String()
             dataStr += ","
+            if elapsed.Seconds() >= 60*2.5 {
+                dataStr += "Too long!!!"
+            }
         }
         dataStr += "\n"
     }
