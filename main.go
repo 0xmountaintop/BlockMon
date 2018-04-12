@@ -100,17 +100,17 @@ func main() {
         }
 
         dataStr += strconv.FormatUint(resp.Data.Height, 10)
-        dataStr += ","
+        dataStr += "\t"
         dataStr += strconv.FormatInt(resp.Data.Timestamp, 10)
-        dataStr += ","
+        dataStr += "\t"
         dataStr += resp.Data.Diffi
-        dataStr += ","
+        dataStr += "\t"
         dataStr += time.Unix(resp.Data.Timestamp,0).String()
-        dataStr += ","
+        dataStr += "\t"
         if i > 1 {
             dataStr += "elapsed:"
             dataStr += elapsed.String()
-            dataStr += ","
+            dataStr += "\t"
             if elapsed.Seconds() >= retargetSeconds {
                 dataStr += "Too long!!!"
             }
@@ -128,19 +128,19 @@ func main() {
                     diffi_elapsed.String())
             }
             diffiStr += strconv.FormatUint(resp.Data.Height, 10)
-            diffiStr += ","
+            diffiStr += "\t"
             diffiStr += strconv.FormatInt(resp.Data.Timestamp, 10)
-            diffiStr += ","
+            diffiStr += "\t"
             diffiStr += resp.Data.Diffi
-            diffiStr += ","
+            diffiStr += "\t"
             diffiStr += time.Unix(resp.Data.Timestamp,0).String()
-            diffiStr += ","
+            diffiStr += "\t"
             if i > 1 {
                 diffiStr += "blocks interval:"
                 diffiStr += strconv.FormatUint(resp.Data.Height - last_diffi_blck_height, 10)
-                diffiStr += ","
+                diffiStr += "\t"
                 diffiStr += diffi_elapsed.String()
-                diffiStr += ","
+                diffiStr += "\t"
             }
             diffiStr += "\n"
             last_diffi_blck_height = resp.Data.Height
