@@ -1,6 +1,6 @@
 ﻿<html>
 <head>
-    <title>K线图</title>
+    <title>Difficulty</title>
     <meta name="renderer" content="webkit"/>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -21,7 +21,7 @@
 
 <div class="kline">
 
-    <h1>K线图</h1>
+    <h1>Difficulty</h1>
     <div id="kline_container"></div>
     <hr>
 
@@ -63,14 +63,14 @@
         theme: 'dark', // light/dark
         language: 'zh-cn', // zh-cn/en-us/zh-tw
         ranges: ["1w", "1d", "1h", "30m", "15m", "5m", "1m", "line"],
-        symbol: "BTC",
-        symbolName: "BTC/USD",
+        symbol: "Diffi",
+        symbolName: "Diffi (big.Int)",
         type: "poll", // poll/socket
-        url: "/examples/mock.json",
+        url: "/data/data.json",
         limit: 1000,
         intervalTime: 5000,
         debug: true,
-        showTrade: true,
+        showTrade: false,
         onResize: function(width, height) {
             console.log("chart resized: " + width + " " + height);
         }
