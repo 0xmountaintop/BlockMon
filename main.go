@@ -8,6 +8,7 @@ import(
     "time"
     "encoding/json"
     "io/ioutil"
+    "net/http"
     
     "github.com/parnurzeal/gorequest"
     // "github.com/bytom/consensus/difficulty"
@@ -40,6 +41,9 @@ const (
 
 
 func main() {
+    go http.ListenAndServe(":8080", http.FileServer(http.Dir(".")))
+
+dododo:
     request := gorequest.New()
     var resp t_resp
 
@@ -54,6 +58,7 @@ func main() {
 
     var dataStr string
     var diffiStr string
+    var jsonStr1 string
     var elapsed time.Duration
     var diffi_elapsed time.Duration
     last_blck_timestamp := int64(0)
@@ -118,6 +123,30 @@ func main() {
         dataStr += "\n"
 
 
+        jsonStr1 = `{
+                        "data": {
+                            "lines": [
+                                        [
+                                            0,
+                                            91.29,
+                                            91.29,
+                                            91.29,
+                                            91.29,
+                                            0.0
+                                        ],
+                                        [
+                                            600000,
+                                            291.29,
+                                            291.29,
+                                            291.29,
+                                            291.29,
+                                            0.0
+                                        ]
+                                    ]
+                                },
+                        "success": true
+                    }`
+
         if resp.Data.Diffi != last_diffi {
             diffi_elapsed = time.Unix(resp.Data.Timestamp,0).Sub(time.Unix(last_diffi_timestamp,0))
             if i > 1 {
@@ -154,6 +183,11 @@ func main() {
     check(err)
     err = ioutil.WriteFile("./diffi-changes.csv", []byte(diffiStr), 0644)
     check(err)
+
+    err = ioutil.WriteFile("./data/diffiData.json", []byte(jsonStr1), 0644)
+    check(err)
+
+goto dododo
 }
 
 func check(e error) {
