@@ -41,7 +41,7 @@ const (
 
 
 func main() {
-    go http.ListenAndServe(":8080", http.FileServer(http.Dir(".")))
+    go http.ListenAndServe(":80", http.FileServer(http.Dir(".")))
 
 dododo:
     request := gorequest.New()
@@ -141,11 +141,7 @@ dododo:
                                             291.29,
                                             291.29,
                                             0.0
-                                        ]
-                                    ]
-                                },
-                        "success": true
-                    }`
+                                        ]`
 
         if resp.Data.Diffi != last_diffi {
             diffi_elapsed = time.Unix(resp.Data.Timestamp,0).Sub(time.Unix(last_diffi_timestamp,0))
@@ -179,11 +175,18 @@ dododo:
 
         last_blck_timestamp = resp.Data.Timestamp
     }
+
+    jsonStr1 += `
+                                    ]
+                                },
+                        "success": true
+                    }`
+
+
     err := ioutil.WriteFile("./all-blocks.csv", []byte(dataStr), 0644)
     check(err)
     err = ioutil.WriteFile("./diffi-changes.csv", []byte(diffiStr), 0644)
     check(err)
-
     err = ioutil.WriteFile("./data/diffiData.json", []byte(jsonStr1), 0644)
     check(err)
 
