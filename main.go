@@ -58,13 +58,22 @@ dododo:
 
     var dataStr string
     var diffiStr string
-    var jsonStr1 string
+    var jsonDiffiStr string
     var elapsed time.Duration
     var diffi_elapsed time.Duration
     last_blck_timestamp := int64(0)
     last_diffi_blck_height := uint64(1)
     last_diffi := ""
     last_diffi_timestamp := int64(0)
+
+
+    jsonDiffiStr = `
+                {
+                    "data": {
+                        "lines": [
+                `
+
+
     for i := uint64(1); i <= resp.Data.BlockCount; i++ {
         _, body, _ = request.Post(walletAddr + "get-block").
             Send(`{
@@ -122,27 +131,6 @@ dododo:
         }
         dataStr += "\n"
 
-
-        jsonStr1 = `{
-                        "data": {
-                            "lines": [
-                                        [
-                                            0,
-                                            91.29,
-                                            91.29,
-                                            91.29,
-                                            91.29,
-                                            0.0
-                                        ],
-                                        [
-                                            600000,
-                                            291.29,
-                                            291.29,
-                                            291.29,
-                                            291.29,
-                                            0.0
-                                        ]`
-
         if resp.Data.Diffi != last_diffi {
             diffi_elapsed = time.Unix(resp.Data.Timestamp,0).Sub(time.Unix(last_diffi_timestamp,0))
             if i > 1 {
@@ -168,6 +156,22 @@ dododo:
                 diffiStr += "\t"
             }
             diffiStr += "\n"
+
+            jsonDiffiStr += `   [`
+            millisec := time.Unix(resp.Data.Timestamp,0).UnixNano() / int64(time.Millisecond)
+            jsonDiffiStr += strconv.FormatInt(millisec, 10)
+            jsonDiffiStr += `               ,`
+            jsonDiffiStr += resp.Data.Diffi
+            jsonDiffiStr += `               ,`
+            jsonDiffiStr += resp.Data.Diffi
+            jsonDiffiStr += `               ,`
+            jsonDiffiStr += resp.Data.Diffi
+            jsonDiffiStr += `               ,`
+            jsonDiffiStr += resp.Data.Diffi
+            jsonDiffiStr += `               ,
+                                    0.0
+                                ],`
+
             last_diffi_blck_height = resp.Data.Height
             last_diffi = resp.Data.Diffi
             last_diffi_timestamp = resp.Data.Timestamp
@@ -176,18 +180,20 @@ dododo:
         last_blck_timestamp = resp.Data.Timestamp
     }
 
-    jsonStr1 += `
+    jsonDiffiStr = jsonDiffiStr[0:len([]rune(jsonDiffiStr))-1]
+    jsonDiffiStr += `
                                     ]
                                 },
                         "success": true
-                    }`
+                    }
+                `
 
 
     err := ioutil.WriteFile("./all-blocks.csv", []byte(dataStr), 0644)
     check(err)
     err = ioutil.WriteFile("./diffi-changes.csv", []byte(diffiStr), 0644)
     check(err)
-    err = ioutil.WriteFile("./data/diffiData.json", []byte(jsonStr1), 0644)
+    err = ioutil.WriteFile("./data/diffiData.json", []byte(jsonDiffiStr), 0644)
     check(err)
 
 goto dododo
