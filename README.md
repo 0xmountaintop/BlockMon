@@ -1,8 +1,6 @@
 # BlockMon
 
-区块萌，区块妈。
-
-A block monitoring service that talks with a test bytom wallet.
+A service monitoring bytom's block generation by talking with a test wallet.
 
 ```
 sudo go run main.go
