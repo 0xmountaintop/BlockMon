@@ -1,6 +1,8 @@
-# BlockProbe
+# BlockMon
 
-A block info collector that talks with the test wallet.
+区块萌，区块妈。
+
+A block monitoring service that talks with a test bytom wallet.
 
 ```
 sudo go run main.go
