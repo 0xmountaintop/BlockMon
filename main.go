@@ -35,7 +35,7 @@ type t_resp struct {
 
 
 const (
-    walletAddr = "http://101.37.164.153:9888/"
+    walletAddr = "http://101.37.166.248:9888/"
     retargetSeconds = 60
 )
 
