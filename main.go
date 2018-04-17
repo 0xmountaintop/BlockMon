@@ -35,7 +35,7 @@ type t_resp struct {
 
 
 const (
-    walletAddr = "http://localhost:9888/"
+    walletAddr = "http://101.37.164.153:9888/"
     retargetSeconds = 60
 )
 
@@ -59,6 +59,8 @@ dododo:
     var dataStr string
     var diffiStr string
     var jsonDiffiStr string
+    var jsonBTStr string
+    var jsonRTStr string
     var elapsed time.Duration
     var diffi_elapsed time.Duration
     last_blck_timestamp := int64(0)
@@ -70,6 +72,9 @@ dododo:
     jsonDiffiStr = "{\n"
     jsonDiffiStr += "\t\"data\": {\n"
     jsonDiffiStr += "\t\t\"lines\": [\n"
+
+    jsonBTStr = ""
+    jsonRTStr = ""
 
 
     for i := uint64(1); i <= resp.Data.BlockCount; i++ {
