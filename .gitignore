@@ -18,4 +18,4 @@
 
 # Data generated
 *.csv
-data/*.json
+data/
