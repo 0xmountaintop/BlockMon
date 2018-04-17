@@ -35,7 +35,7 @@ type t_resp struct {
 
 
 const (
-    walletAddr = "http://101.37.164.153:9888/"
+    walletAddr = "http://101.37.166.248:9888/"
     retargetSeconds = 60
 )
 
@@ -59,8 +59,8 @@ dododo:
     var dataStr string
     var diffiStr string
     var jsonDiffiStr string
-    var jsonBTStr string
-    var jsonRTStr string
+    var jsBKStr string
+    var jsRTStr string
     var elapsed time.Duration
     var diffi_elapsed time.Duration
     last_blck_timestamp := int64(0)
@@ -73,8 +73,8 @@ dododo:
     jsonDiffiStr += "\t\"data\": {\n"
     jsonDiffiStr += "\t\t\"lines\": [\n"
 
-    jsonBTStr = ""
-    jsonRTStr = ""
+    jsBKStr = "bkdata = '["
+    jsRTStr = "rtdata = '["
 
 
     for i := uint64(1); i <= resp.Data.BlockCount; i++ {
@@ -131,6 +131,12 @@ dododo:
             if elapsed.Seconds() >= retargetSeconds {
                 dataStr += "Too long!!!"
             }
+
+            jsBKStr += "{\"x\" : \""
+            jsBKStr += strconv.FormatUint(resp.Data.Height, 10)
+            jsBKStr += "\", \"y\" : \""
+            jsBKStr += strconv.FormatInt(int64(elapsed.Seconds()), 10)
+            jsBKStr += "\"},"
         }
         dataStr += "\n"
 
@@ -157,6 +163,12 @@ dododo:
                 diffiStr += "\t"
                 diffiStr += diffi_elapsed.String()
                 diffiStr += "\t"
+
+                jsRTStr += "{\"x\" : \""
+                jsRTStr += strconv.FormatUint(resp.Data.Height, 10)
+                jsRTStr += "\", \"y\" : \""
+                jsRTStr += strconv.FormatInt(int64(diffi_elapsed.Minutes()), 10)
+                jsRTStr += "\"},"
             }
             diffiStr += "\n"
 
@@ -187,11 +199,20 @@ dododo:
     jsonDiffiStr += "}"
 
 
+    jsBKStr = jsBKStr[0:len([]rune(jsBKStr))-1]
+    jsBKStr += "]';"
+    jsRTStr = jsRTStr[0:len([]rune(jsRTStr))-1]
+    jsRTStr += "]';"
+
     err := ioutil.WriteFile("./all-blocks.csv", []byte(dataStr), 0644)
     check(err)
     err = ioutil.WriteFile("./diffi-changes.csv", []byte(diffiStr), 0644)
     check(err)
     err = ioutil.WriteFile("./data/diffi.json", []byte(jsonDiffiStr), 0644)
+    check(err)
+    err = ioutil.WriteFile("./data/block.js", []byte(jsBKStr), 0644)
+    check(err)
+    err = ioutil.WriteFile("./data/retarget.js", []byte(jsRTStr), 0644)
     check(err)
 
 goto dododo

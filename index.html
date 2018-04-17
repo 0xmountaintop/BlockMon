@@ -1,6 +1,6 @@
 ﻿<html>
 <head>
-    <title>Difficulty</title>
+    <title>区块萌</title>
     <!--
         <meta http-equiv="refresh" content="3">
     -->
@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src="/lib/jquery.js"></script>
     <script src="/lib/jquery.mousewheel.js"></script>
-    <script src="/lib/chart.2.7.2.bundle.js"></script>
+    <script src="/lib/plotly-latest.min.js"></script>
     <style type="text/css">
         .kline {
             width: 1200px;
@@ -23,29 +23,58 @@
 </head>
 
 <body>
+
+<h1 style="text-align:center">BlockMon</h1>
+
 <div class="kline">
-    <h1>Retarget Time</h1>
-    <script type="text/javascript" src="data/block-time.json">
+    <h2>Retarget Time</h2>
+
+    <div id="retarget" style="width:100%;height:480px;"></div>
+    <script type="text/javascript" src="/data/retarget.js">
     </script>
     <script type="text/javascript">
-        var blockTimeData = JSON.parse(data);
-        
+    var rt = JSON.parse(rtdata);
+    var xxrt = [];
+    var yyrt = [];
+    for (var i = 0; i <  rt.length; i++) {
+        xxrt.push(rt[i].x);
+        yyrt.push(rt[i].y);
+    }
+    
+    RETARTt = document.getElementById('retarget');
+    Plotly.plot( RETARTt, [{
+        x: xxrt,
+        y: yyrt
+    }], {margin:{t:0}});
     </script>
 </div>
 
 <body>
 <div class="kline">
-    <h1>Block Time</h1><!-- 
-    <script type="text/javascript" src="data/block-time.json">
+    <h2>Block Time</h2>
+
+    <div id="block" style="width:100%;height:480px;"></div>
+    <script type="text/javascript" src="/data/block.js">
     </script>
     <script type="text/javascript">
-        var blockTimeData = JSON.parse(data);
-        // alert(blockTimeData.length);
-    </script> -->
+    var bk = JSON.parse(bkdata);
+    var xxbk = [];
+    var yybk = [];
+    for (var i = 0; i <  bk.length; i++) {
+        xxbk.push(bk[i].x);
+        yybk.push(bk[i].y);
+    }
+    
+    BLOCKt = document.getElementById('block');
+    Plotly.plot( BLOCKt, [{
+        x: xxbk,
+        y: yybk
+    }], {margin:{t:0}});
+    </script>
 </div>
 
 <div class="kline">
-    <h1>Difficulty</h1>
+    <h2>Difficulty</h2>
     <div id="kline_container"></div>
     <hr>
 </div>
