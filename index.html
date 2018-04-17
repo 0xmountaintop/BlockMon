@@ -18,9 +18,30 @@
             position: relative;
         }
     </style>
+
 </head>
 
 <body>
+<div class="kline">
+    <h1>Retarget Time</h1><!-- 
+    <script type="text/javascript" src="data/block-time.json">
+    </script>
+    <script type="text/javascript">
+        // var blockTimeData = JSON.parse(data);
+        // alert();
+    </script> -->
+</div>
+
+<body>
+<div class="kline">
+    <h1>Block Time</h1><!-- 
+    <script type="text/javascript" src="data/block-time.json">
+    </script>
+    <script type="text/javascript">
+        var blockTimeData = JSON.parse(data);
+        // alert(blockTimeData.length);
+    </script> -->
+</div>
 
 <div class="kline">
 
@@ -69,7 +90,7 @@
         symbol: "Diffi",
         symbolName: "Diffi (big.Int)",
         type: "poll", // poll/socket
-        url: "/data/DiffiData.json",
+        url: "/data/diffi.json",
         limit: 1000,
         intervalTime: 5000,
         debug: true,

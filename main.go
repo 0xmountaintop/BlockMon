@@ -35,7 +35,7 @@ type t_resp struct {
 
 
 const (
-    walletAddr = "http://101.37.166.248:9888/"
+    walletAddr = "http://localhost:9888/"
     retargetSeconds = 60
 )
 
@@ -67,11 +67,9 @@ dododo:
     last_diffi_timestamp := int64(0)
 
 
-    jsonDiffiStr = `
-                {
-                    "data": {
-                        "lines": [
-                `
+    jsonDiffiStr = "{\n"
+    jsonDiffiStr += "\t\"data\": {\n"
+    jsonDiffiStr += "\t\t\"lines\": [\n"
 
 
     for i := uint64(1); i <= resp.Data.BlockCount; i++ {
@@ -157,20 +155,18 @@ dododo:
             }
             diffiStr += "\n"
 
-            jsonDiffiStr += `   [`
+            jsonDiffiStr += "\t\t\t["
             millisec := time.Unix(resp.Data.Timestamp,0).UnixNano() / int64(time.Millisecond)
             jsonDiffiStr += strconv.FormatInt(millisec, 10)
-            jsonDiffiStr += `               ,`
+            jsonDiffiStr += " ,"
             jsonDiffiStr += resp.Data.Diffi
-            jsonDiffiStr += `               ,`
+            jsonDiffiStr += " ,"
             jsonDiffiStr += resp.Data.Diffi
-            jsonDiffiStr += `               ,`
+            jsonDiffiStr += " ,"
             jsonDiffiStr += resp.Data.Diffi
-            jsonDiffiStr += `               ,`
+            jsonDiffiStr += " ,"
             jsonDiffiStr += resp.Data.Diffi
-            jsonDiffiStr += `               ,
-                                    0.0
-                                ],`
+            jsonDiffiStr += " , 0.0],\n"
 
             last_diffi_blck_height = resp.Data.Height
             last_diffi = resp.Data.Diffi
@@ -180,20 +176,17 @@ dododo:
         last_blck_timestamp = resp.Data.Timestamp
     }
 
-    jsonDiffiStr = jsonDiffiStr[0:len([]rune(jsonDiffiStr))-1]
-    jsonDiffiStr += `
-                                    ]
-                                },
-                        "success": true
-                    }
-                `
+    jsonDiffiStr = jsonDiffiStr[0:len([]rune(jsonDiffiStr))-2]
+    jsonDiffiStr += "\n\t\t]},\n"
+    jsonDiffiStr += "\t\"success\": true\n"
+    jsonDiffiStr += "}"
 
 
     err := ioutil.WriteFile("./all-blocks.csv", []byte(dataStr), 0644)
     check(err)
     err = ioutil.WriteFile("./diffi-changes.csv", []byte(diffiStr), 0644)
     check(err)
-    err = ioutil.WriteFile("./data/diffiData.json", []byte(jsonDiffiStr), 0644)
+    err = ioutil.WriteFile("./data/diffi.json", []byte(jsonDiffiStr), 0644)
     check(err)
 
 goto dododo
